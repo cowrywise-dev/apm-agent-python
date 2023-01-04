@@ -145,7 +145,7 @@ class DjangoClient(Client):
                         data["_files"] = {field: file.name for field, file in request.FILES.items()}
                 else:
                     try:
-                        data = request.body
+                        data = request.data if isinstance(request, DrfRequest) else request.body
                     except Exception as e:
                         self.logger.debug("Can't capture request body: %s", str(e))
                         data = "<unavailable>"
