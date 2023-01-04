@@ -146,8 +146,7 @@ class DjangoClient(Client):
                 else:
                     self.logger.debug("Attempting to capture body")
                     try:
-
-                        data = request.data if isinstance(request, DrfRequest) else request.body
+                        data = data = getattr(request, "data", request.body)
                     except Exception as e:
                         self.logger.debug("Can't capture request body: %s", str(e))
                         data = "<unavailable>"
