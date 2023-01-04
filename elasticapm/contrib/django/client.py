@@ -35,6 +35,7 @@ import django
 from django.conf import settings as django_settings
 from django.db import DatabaseError
 from django.http import HttpRequest
+import traceback
 
 try:
     from rest_framework.request import Request as DrfRequest
@@ -144,12 +145,18 @@ class DjangoClient(Client):
                     if request.FILES:
                         data["_files"] = {field: file.name for field, file in request.FILES.items()}
                 else:
+
                     self.logger.debug("Attempting to capture body")
+                    
                     try:
-                        data = data = getattr(request, "POST", request.body)
+
+                        data = getattr(request, "POST", request.body)
+
                     except Exception as e:
-                        self.logger.debug("Can't capture request body: %s", str(e))
+                        stack_trace = traceback.format_exc()
+                        self.logger.debug("Can't capture request body: %s", str(stack_trace))
                         data = "<unavailable>"
+
                 if data is not None:
                     # Can we apply this as a processor instead?
                     # https://github.com/elastic/apm-agent-python/issues/305
